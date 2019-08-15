@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+<head>
+    <meta charset="utf-8">
+    <title>asbamboo/handbook-tool</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="手册制作工具">
+    <meta name="author" content="李春寅 licy2013@aliyun.com">
+	<style>
+		frameset {
+			border:0;
+		}
+	</style>
+	<script>
+		const checkKey	= function(){
+			let checked = false;
+			if(key = prompt("Please enter a valid key for the system。")){
+				let xhr = new XMLHttpRequest();
+				xhr.open('POST', 'tool.php?type=key.check', true);
+
+				xhr.onload = function () {
+				   console.log(xhr);
+					if(xhr.status != 200 || xhr.response != "SUCCESS"){
+						checkKey();			
+					}
+					menuframe.location.reload();
+					listframe.location.reload();
+					checked =  true;
+				};
+				
+				xhr.error = function (a, b, c){
+				   console.log(xhr);
+					checkKey();						
+				}
+
+				xhr.send(key);
+			}else{
+				checkKey();										
+			}
+		}
+		window.onload = checkKey;
+
+		const handbookMenuTool	= {
+			init(){
+				let _this = this;
+				let $menuContainer	= menuframe.document.querySelector('.menu-container');
+				let $addBtn	= this.makeAddBtn();
+				$addBtn.append("添加主菜单");
+				$addBtn.style.position = 'absolute';
+				$addBtn.style.top = '30px';
+				$addBtn.style.right = '0';
+				$addBtn.style['z-index'] = '999';
+				$addBtn.style.display = "none";
+				$addBtn.onclick = function(){
+					_this.addSubMenu($menuContainer);
+				}
+				menuframe.document.body.onmouseover = function(){
+					$addBtn.style.display	= 'block';
+				}
+				menuframe.document.body.onmouseout = function(){
+					$addBtn.style.display	= 'none';
+				}
+				$menuContainer.before($addBtn);
+				let $lis	= $menuContainer.querySelectorAll('li');
+				for(var i = 0; i < $lis.length; i++){
+					let $li = $lis[i];
+					let $addBtn	= _this.makeAddBtn();
+					$addBtn.onclick = function(){
+						_this.addSubMenu($li.querySelector('ul'));
+					}
+					$li.append($addBtn);
+					
+					let $removeBtn = this.makeRemoveBtn();
+					$removeBtn.onclick = function(){
+						_this.removeMenu($li);
+					}
+					$li.append($removeBtn);
+
+					let $ascBtn = this.makeAscBtn();
+					$ascBtn.onclick = function(){
+						if(!$li.previousSibling){
+							return;
+						}
+						let $prevLi	= $li.previousSibling;
+						let $cloneLi = $li.cloneNode(true);
+						$prevLi.before($cloneLi);
+						$li.remove()
+						_this.saveMenu();
+					}
+					$li.append($ascBtn);
+
+					let $descBtn = this.makeDescBtn();
+					$descBtn.onclick = function(){
+						if(!$li.nextSibling){
+							return;
+						}
+						let $nextLi	= $li.nextSibling;
+						let $cloneLi = $nextLi.cloneNode(true);
+						$li.before($cloneLi);
+						$nextLi.remove();
+						_this.saveMenu();
+					}
+					$li.append($descBtn);
+
+					let $a = $li.querySelector('a');
+					let page = $a.getAttribute('data-page');
+					if(page.search(/\:\/\//) == -1){
+						$a.href	= 'tool.php?type=page.get&page=' + $a.getAttribute('data-page');
+					}
+					
+					$li.style.position	= "relative";
+					$addBtn.style.position = "absolute";
+					$addBtn.style.top = 5;
+					$addBtn.style.right = 3;
+					$addBtn.style.display = "none";
+					$removeBtn.style.position = "absolute";
+					$removeBtn.style.top = 5;
+					$removeBtn.style.right = 35;
+					$removeBtn.style.display = "none";
+					$descBtn.style.position = "absolute";
+					$descBtn.style.top = 5;
+					$descBtn.style.right = 65;
+					$descBtn.style.display = "none";
+					$ascBtn.style.position = "absolute";
+					$ascBtn.style.top = 5;
+					$ascBtn.style.right = 100;
+					$ascBtn.style.display = "none";
+					$li.onmouseover = function(){
+						$addBtn.style.display	= 'block';
+						$removeBtn.style.display	= 'block';
+						$descBtn.style.display	= 'block';
+						$ascBtn.style.display	= 'block';
+					}
+					$li.onmouseout = function(){
+						$addBtn.style.display	= 'none';
+						$removeBtn.style.display	= 'none';
+						$descBtn.style.display	= 'none';
+						$ascBtn.style.display	= 'none';
+					}
+				}
+			},
+			makeAddBtn(){
+				let $addBtn = document.createElement('button');
+				$addBtn.classList.add("add-menu-btn");
+				$addBtn.title = '添加子菜单';
+				$addBtn.append("+");
+				return $addBtn;
+			},
+			makeRemoveBtn(){
+				let $removeBtn = document.createElement('button');
+				$removeBtn.classList.add("remove-menu-btn");
+				$removeBtn.title="删除菜单"
+				$removeBtn.append("-");
+				return $removeBtn;
+			},
+			makeAscBtn(){
+				let $ascBtn = document.createElement('button');
+				$ascBtn.classList.add("asc-menu-btn");
+				$ascBtn.title="向上排序"
+				$ascBtn.append("↑");
+				return $ascBtn;
+			},
+			makeDescBtn(){
+				let $descBtn = document.createElement('button');
+				$descBtn.classList.add("desc-menu-btn");
+				$descBtn.title="向下排序"
+				$descBtn.append("↓");
+				return $descBtn;
+			},
+			removeMenu($menu) {
+				let tip = '你确定要删除该菜单吗？';
+				if($menu.querySelector('ul').childElementCount > 0){
+					tip = '该菜单下含有子菜单，你确定要删除菜单吗？';
+				}
+				if(confirm(tip)){
+					$menu.remove();
+					this.saveMenu();					
+				}
+			},
+			addSubMenu($menuContainer) {
+				let _this = this;
+				let menu_name;
+				let page_name;
+				let menu_depth = parseInt($menuContainer.getAttribute('data-depth'), 10);
+				if((menu_name = prompt('请输入菜单名称')) && (page_name = prompt('请输入页面名称'))){
+					console.log(menu_name, page_name);
+					if(page_name.search(/\./) == -1 && page_name.search(/\:\/\//) == -1){
+						page_name	= page_name + '.html';
+					}
+					
+					let $li = document.createElement('li');
+
+					let $a = document.createElement('a');
+					if( page_name.search(/\:\/\//) == -1 ){
+						$a.href = 'tool.php?type=page.get&page=' + page_name;
+					}else{
+						$a.href = page_name;						
+					}
+					$a.setAttribute('data-page', page_name);
+					$a.style['padding-left'] = (2 * menu_depth) + "em";
+					$a.text = menu_name;
+					$a.target = "pageframe";
+					$li.append($a);
+
+					let $ul = document.createElement('ul');
+					$ul.setAttribute('data-depth', menu_depth + 1);
+					$li.append($ul);
+
+					$menuContainer.append($li);
+
+					
+					_this.saveMenu();
+					listframe.location.reload();
+				}
+			},
+			saveMenu(){
+				let xhr = new XMLHttpRequest();
+				xhr.open('POST', 'tool.php?type=page.save&page=menu.html', true);
+
+				xhr.onloadend = function () {
+					if(xhr.status != 200 || xhr.response != "SUCCESS"){
+						alert('系统出现异常');						
+					}
+				   console.log(xhr);
+				};
+				
+				xhr.error = function (a, b, c){
+					alert('系统出现异常');
+				   console.log(xhr);
+				}
+
+				xhr.send(menuframe.document);
+				
+				menuframe.location.reload();
+			}
+		}
+	</script>
+	<script>
+		const handbookPageTool = {
+			init() {
+				if(pageframe.location.href == 'about:blank'){
+					pageframe.document.write('about:blank');
+					return;
+				}
+				let _this = this;
+				let pageContent = pageframe.document.body.innerHTML;
+
+				let $configSctipt	= document.createElement('script');
+				$configSctipt.src = 'ueditor/ueditor.config.js';
+				pageframe.document.body.appendChild($configSctipt);
+
+				let $sctipt	= document.createElement('script');
+				$sctipt.src = 'ueditor/ueditor.all.min.js';
+				pageframe.document.body.appendChild($sctipt);
+
+				let $editor	= document.createElement('textarea');
+				$editor.id = "pageframeEditor"
+				$editor.style.position = 'absolute';
+				$editor.style.top = '0';
+				$editor.style.left = '0';
+				$editor.style.width	= '100%';
+				$editor.style.height = '100%';
+				$editor.innerHTML = pageContent;
+				pageframe.document.body.append($editor);
+
+				let $pageframeEditor;
+				
+				$sctipt.onload	= function(){
+
+					let $langSctipt	= document.createElement('script');
+					$langSctipt.src = 'ueditor/lang/zh-cn/zh-cn.js';
+					pageframe.document.body.appendChild($langSctipt);
+				};
+				
+
+				let $saveButton	= document.createElement('button');
+				$saveButton.append('保存');
+				$saveButton.style.position		= 'fixed';
+				$saveButton.style.right			= '0';
+				$saveButton.style.bottom		= '0';
+				$saveButton.style.width			= '50%';			
+				$saveButton.style['z-index']	= '99999';
+				$saveButton.onclick				= function(){
+					_this.savePage($pageframeEditor);
+				}
+				pageframe.document.body.append($saveButton);
+
+				let $cancelButton	= document.createElement('button');
+				$cancelButton.append('取消');
+				$cancelButton.style.position		= 'fixed';
+				$cancelButton.style.left			= '0';
+				$cancelButton.style.bottom			= '0';
+				$cancelButton.style.width			= '50%';			
+				$cancelButton.style['z-index']		= '99999';
+				$cancelButton.onclick				= function(){
+					document.getElementsByTagName('frameset').rootframe.cols="300, *, 300";
+					pageframe.location.reload();				
+				}
+				pageframe.document.body.append($cancelButton);
+
+				
+				$saveButton.style.display	= "none";
+				$editor.style.display	= "none";
+				$cancelButton.style.display	= "none";
+				let $startEditBtn	= document.createElement('button');
+				$startEditBtn.append("编辑文档内容");
+				$startEditBtn.style.position="fixed";
+				$startEditBtn.style.bottom="50%";
+				$startEditBtn.style.right="50%";
+				$startEditBtn.style.padding	= "20px";
+				$startEditBtn.style.display = "none";
+				pageframe.document.body.append($startEditBtn);
+				pageframe.document.body.onmouseover	= function(){
+					$startEditBtn.style.display	= "block";
+				}
+				pageframe.document.body.onmouseout	= function(){
+					$startEditBtn.style.display	= "none";
+				}
+				
+				$startEditBtn.onclick	= function(){
+					$saveButton.style.display	= "block";					
+					$cancelButton.style.display	= "block";
+					$editor.style.display	= "block";
+					$pageframeEditor = pageframe.window.UE.getEditor('pageframeEditor');
+					$pageframeEditor.addListener('ready', function(){
+						let $fullscreenBtn	= pageframe.document.body.querySelector('.edui-for-fullscreen');
+						$fullscreenBtn.onclick = function(){
+							console.log($fullscreenBtn);
+							console.log($fullscreenBtn.querySelector('.edui-state-checked'));
+							if($fullscreenBtn.querySelector('.edui-state-checked')){
+								document.getElementsByTagName('frameset').rootframe.cols="0, *, 0";
+							}else{
+								document.getElementsByTagName('frameset').rootframe.cols="300, *, 300";
+							}							
+						}
+					});
+				}
+			},
+			savePage($pageframeEditor) {
+				let location_search	= pageframe.location.search;
+				let page = location_search.substr(location_search.search('page=') + 5);
+				
+				let xhr = new XMLHttpRequest();
+				xhr.open('POST', 'tool.php?type=page.save&page=' + page, true);
+
+				xhr.onloadend = function () {
+					if(xhr.status != 200 || xhr.response != "SUCCESS"){
+						alert('系统出现异常');						
+					}
+				   console.log(xhr);
+				};
+				
+				xhr.error = function (a, b, c){
+					alert('系统出现异常');
+				   console.log(xhr);
+				}
+
+				xhr.send($pageframeEditor.getContent());
+				document.getElementsByTagName('frameset').rootframe.cols="300, *, 300";
+				pageframe.location.reload();
+			}
+		}
+	</script>
+</head>
+<frameset cols="300, *, 300" frameboder="no" border="1" name="rootframe">
+  <frame name="menuframe" src="tool.php?type=page.get&page=menu" onload="handbookMenuTool.init()" />
+  <frame name="pageframe" onload="handbookPageTool.init()"/>
+  <frame name="listframe" src="tool.php?type=page.list" />
+</frameset>
+
+</html>

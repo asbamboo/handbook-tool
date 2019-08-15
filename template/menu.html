@@ -1,0 +1,89 @@
+<html>
+<title><?=$GLOBALS['CONFIG']['HANDBOOK_TITLE']?></title>
+<style>
+html, body {
+	font-size: 14px;
+	padding: 0;
+	margin: 0;
+	background: #fafafa;
+	color: #666666;
+}
+
+h1, h2, h3, h4, h5, h6, h7, ul, li {
+	margin: 0;
+	padding: 0;
+}
+
+.doc-title {
+	border-bottom: 1px inset #dddddd;
+	position: fixed;
+	width: 100%;
+	padding: 10px 0;
+	height: 40px;
+	top: 0;
+	left: 0;
+	background: #fafafa;
+	z-index: 2;
+}
+
+.doc-title h1 {
+	font-size: 28px;
+	text-align: center;
+}
+
+
+.doc-menu {
+	display: block;
+	position:absolute;
+	top: 60px;
+	left: 0;
+	width: 100%;
+}
+
+.doc-menu li {
+	display: block;
+}
+
+.doc-menu li a {
+	display: block;
+	padding: .5em;
+	color: #666666;
+	text-decoration: none;
+}
+
+.doc-menu li a:hover {
+	background: #F2F2F2;
+}
+
+.doc-menu li a:active, .doc-menu li a.active {
+	background: #E5E5E5;
+}
+
+</style>
+<body>
+<div class="doc-title">
+	<h1>
+		<?php if(isset($GLOBALS['CONFIG']['HANDBOOK_LOGO'])):?>
+			<img src="image/logo.png" />
+		<?php endif;?>
+		<?=$GLOBALS['CONFIG']['HANDBOOK_TITLE']?>
+	</h1>
+</div>
+<ul class="doc-menu menu-container" data-depth="1"></ul>
+<script>
+window.onload = function(){
+	let $as = document.querySelectorAll('a');
+	for(var i = 0; i < $as.length; i++ ){
+		$a	= $as[i];
+		$a.onclick	= function(event){
+			let $active = document.querySelector('a.active');
+			if($active){				
+				$active.classList="";
+			}
+			event.target.classList="active";
+		}
+	}
+}
+</script>
+</body>
+</html>
