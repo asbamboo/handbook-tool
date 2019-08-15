@@ -32,6 +32,7 @@ if(!is_dir($GLOBALS['CONFIG']['HANDBOOK_ROOT'])){
  * 如果设置了logo，那么先把logo复制到相应的位置。
  */
 if(isset($GLOBALS['CONFIG']['HANDBOOK_LOGO']) && !file_exists($_SERVER['DOCUMENT_ROOT'] . '/image/logo.png')){
+    @mkdir($GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image', 0755, true);
     copy($GLOBALS['CONFIG']['HANDBOOK_LOGO'], $GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image/logo.png');
     symlink($GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image', $_SERVER['DOCUMENT_ROOT'] . '/image');
 }
