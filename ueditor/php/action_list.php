@@ -88,7 +88,7 @@ function getfiles($path, $allowFiles, &$files = array())
             } else {
                 if (preg_match("/\.(".$allowFiles.")$/i", $file)) {
                     $files[] = array(
-                        'url'=> '/' . substr($path2, strlen($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT']) + 1),
+                        'url'=> '/' . substr($path2, strlen(rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/')) + 1),
                         'mtime'=> filemtime($path2)
                     );
                 }

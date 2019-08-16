@@ -14,9 +14,7 @@ $HANDBOOK_TOOL_CONFIG   = include dirname(dirname(__DIR__)) . '/config.php';
 /* 上传配置 */
 $base64 = "upload";
 switch (htmlspecialchars($_GET['action'])) {
-    case 'uploadimage':
-        symlink($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'] . '/image', $_SERVER['DOCUMENT_ROOT'] . '/image');
-        
+    case 'uploadimage':        
         $config = array(
             "pathFormat" => rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/') . '/image/' . ltrim($CONFIG['imagePathFormat'], '/'),
             "maxSize" => $CONFIG['imageMaxSize'],
@@ -25,8 +23,7 @@ switch (htmlspecialchars($_GET['action'])) {
         $fieldName = $CONFIG['imageFieldName'];
         
         break;
-    case 'uploadscrawl':
-        symlink($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'] . '/image', $_SERVER['DOCUMENT_ROOT'] . '/image');
+    case 'uploadscrawl':       
         $config = array(
             "pathFormat" => rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/') . '/image/' . ltrim($CONFIG['scrawlPathFormat'], '/'),
             "maxSize" => $CONFIG['scrawlMaxSize'],
@@ -36,8 +33,7 @@ switch (htmlspecialchars($_GET['action'])) {
         $fieldName = $CONFIG['scrawlFieldName'];
         $base64 = "base64";
         break;
-    case 'uploadvideo':
-        symlink($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'] . '/video', $_SERVER['DOCUMENT_ROOT'] . '/video');
+    case 'uploadvideo':        
         $config = array(
             "pathFormat" => rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/') . '/video/' . ltrim($CONFIG['videoPathFormat'], '/'),
             "maxSize" => $CONFIG['videoMaxSize'],
@@ -46,8 +42,7 @@ switch (htmlspecialchars($_GET['action'])) {
         $fieldName = $CONFIG['videoFieldName'];
         break;
     case 'uploadfile':
-    default:
-        symlink($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'] . '/file', $_SERVER['DOCUMENT_ROOT'] . '/file');
+    default:        
         $config = array(
             "pathFormat" => rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/') . '/file/' . ltrim($CONFIG['filePathFormat'], '/'),
             "maxSize" => $CONFIG['fileMaxSize'],

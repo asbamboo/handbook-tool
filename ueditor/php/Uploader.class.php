@@ -1,5 +1,8 @@
 <?php
 if(!isset($GLOBALS['ENTRANCE'])){ exit('Get out'); }
+
+$HANDBOOK_TOOL_CONFIG   = include dirname(dirname(__DIR__)) . '/config.php';
+
 /**
  * Created by JetBrains PhpStorm.
  * User: taoqili
@@ -63,6 +66,9 @@ class Uploader
             $this->upFile();
         }
 
+        if($this->stateInfo == 'SUCCESS'){
+            $this->replicate();
+        }
         $this->stateMap['ERROR_TYPE_NOT_ALLOWED'] = iconv('unicode', 'utf-8', $this->stateMap['ERROR_TYPE_NOT_ALLOWED']);
     }
 
@@ -353,6 +359,27 @@ class Uploader
     {
         return $this->fileSize <= ($this->config["maxSize"]);
     }
+    
+    /**
+     * 复制文件
+     * 目的是为了编辑文档时文档中的资源文件能正常显示
+     */
+    private function replicate()
+    {
+        global $HANDBOOK_TOOL_CONFIG;
+        if(empty($HANDBOOK_TOOL_CONFIG['HANDBOOK_IS_SYMLINK'])){
+            $copy_path  = $_SERVER['DOCUMENT_ROOT'] . '/' . substr($this->fullName, strlen(rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/')) + 1);
+            $copy_dir   = dirname($copy_path);
+            if(!is_dir($copy_dir)){
+                mkdir($copy_dir, 0755, true);
+            }
+            copy($this->fullName, $copy_path);
+        }else{
+            $relative_path  = substr($this->fullName, strlen(rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/')) + 1);
+            $link_path      = strstr($relative_path, '/', true);
+            symlink($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'] . '/' . $link_path, $_SERVER['DOCUMENT_ROOT'] . '/' . $link_path);
+        }
+    }
 
     /**
      * 获取当前上传成功文件的各项信息
@@ -360,9 +387,8 @@ class Uploader
      */
     public function getFileInfo()
     {
-        $HANDBOOK_TOOL_CONFIG   = include dirname(dirname(__DIR__)) . '/config.php';
-        
-        $relative_url           = substr($this->fullName, strlen($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT']) + 1);
+        global $HANDBOOK_TOOL_CONFIG;
+        $relative_url           = substr($this->fullName, strlen(rtrim($HANDBOOK_TOOL_CONFIG['HANDBOOK_ROOT'], '/')) + 1);
         
         return array(
             "state" => $this->stateInfo,

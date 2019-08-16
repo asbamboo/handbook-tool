@@ -14,7 +14,8 @@ $GLOBALS['ENTRANCE']    = 'tool.php';
  *        'HANDBOOK_ROOT'       => __DIR__ . '/handbook', // 手册存放目录
  *        'HANDBOOK_LOGO'       => __DIR__ . '/handbook/image/logo.png', // logo图片, 可以不设置
  *        'HANDBOOK_TITLE'      => '文档中心', // 文档标题
- *        'HANDBOOK_SECRET_KEY' => '1213', //文档修改秘钥
+ *        'HANDBOOK_SECRET_KEY' => '1213', // 文档修改秘钥
+ *        'HANDBOOK_IS_SYMLINK' => false, // 控制文档关联的资源文件使用复制还是快捷方式。
  *    ];
  * 
  * @var array $CONFIG
@@ -34,7 +35,12 @@ if(!is_dir($GLOBALS['CONFIG']['HANDBOOK_ROOT'])){
 if(isset($GLOBALS['CONFIG']['HANDBOOK_LOGO']) && !file_exists($_SERVER['DOCUMENT_ROOT'] . '/image/logo.png')){
     @mkdir($GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image', 0755, true);
     copy($GLOBALS['CONFIG']['HANDBOOK_LOGO'], $GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image/logo.png');
-    symlink($GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image', $_SERVER['DOCUMENT_ROOT'] . '/image');
+    if(empty($GLOBALS['CONFIG']['HANDBOOK_IS_SYMLINK'])){
+        @mkdir($_SERVER['DOCUMENT_ROOT'] . '/image', 0755, true);
+        copy($GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image/logo.png', $_SERVER['DOCUMENT_ROOT'] . '/image/logo.png');
+    }else{
+        symlink($GLOBALS['CONFIG']['HANDBOOK_ROOT'] . '/image', $_SERVER['DOCUMENT_ROOT'] . '/image');
+    }
 }
 
 /**
