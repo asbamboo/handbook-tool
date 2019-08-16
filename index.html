@@ -69,7 +69,16 @@
 						_this.addSubMenu($li.querySelector('ul'));
 					}
 					$li.append($addBtn);
-					
+
+					let $editBtn = this.makeEditBtn();
+					$editBtn.onclick = function(){
+						if(menuName = prompt('请输入新的菜单名')){
+							$li.querySelector('a').text	= menuName;
+							_this.saveMenu();							
+						}
+					}
+					$li.append($editBtn);
+
 					let $removeBtn = this.makeRemoveBtn();
 					$removeBtn.onclick = function(){
 						_this.removeMenu($li);
@@ -111,31 +120,37 @@
 					$li.style.position	= "relative";
 					$addBtn.style.position = "absolute";
 					$addBtn.style.top = 5;
-					$addBtn.style.right = 3;
+					$addBtn.style.right = 5;
 					$addBtn.style.display = "none";
 					$removeBtn.style.position = "absolute";
 					$removeBtn.style.top = 5;
-					$removeBtn.style.right = 35;
+					$removeBtn.style.right = 30;
 					$removeBtn.style.display = "none";
 					$descBtn.style.position = "absolute";
 					$descBtn.style.top = 5;
-					$descBtn.style.right = 65;
+					$descBtn.style.right = 50;
 					$descBtn.style.display = "none";
 					$ascBtn.style.position = "absolute";
 					$ascBtn.style.top = 5;
-					$ascBtn.style.right = 100;
+					$ascBtn.style.right = 70;
 					$ascBtn.style.display = "none";
+					$editBtn.style.position = "absolute";
+					$editBtn.style.top = 5;
+					$editBtn.style.right = 90;
+					$editBtn.style.display = "none";
 					$li.onmouseover = function(){
 						$addBtn.style.display	= 'block';
 						$removeBtn.style.display	= 'block';
 						$descBtn.style.display	= 'block';
 						$ascBtn.style.display	= 'block';
+						$editBtn.style.display	= 'block';
 					}
 					$li.onmouseout = function(){
 						$addBtn.style.display	= 'none';
 						$removeBtn.style.display	= 'none';
 						$descBtn.style.display	= 'none';
 						$ascBtn.style.display	= 'none';
+						$editBtn.style.display	= 'none';
 					}
 				}
 			},
@@ -144,6 +159,13 @@
 				$addBtn.classList.add("add-menu-btn");
 				$addBtn.title = '添加子菜单';
 				$addBtn.append("+");
+				return $addBtn;
+			},
+			makeEditBtn(){
+				let $addBtn = document.createElement('button');
+				$addBtn.classList.add("add-menu-btn");
+				$addBtn.title = '修改菜单名';
+				$addBtn.append("E");
 				return $addBtn;
 			},
 			makeRemoveBtn(){

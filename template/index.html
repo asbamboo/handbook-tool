@@ -5,10 +5,60 @@
     <title><?=$GLOBALS['CONFIG']['HANDBOOK_TITLE']?></title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="李春寅 licy2013@aliyun.com">
+	<script>
+	    function menuSizeControl () {
+	    	document.getElementsByTagName('frameset').rootframe.cols="300, *";        		        		
+	
+	    	const $docControlBtn = document.createElement('div');
+			$docControlBtn.append('〓');
+			$docControlBtn.id="doc-size-control";
+			$docControlBtn.style.position	= 'fixed';
+			$docControlBtn.style.top		= '0';
+			$docControlBtn.style.left		= '0';
+			$docControlBtn.style.margin		= '5px';
+			$docControlBtn.style.padding	= '5px';
+			$docControlBtn.style.background	= '#FFF';
+			$docControlBtn.style.color		= '#999999';
+			$docControlBtn.style.border		= '1px solid #DDDDDD';
+			$docControlBtn.style.cursor		= 'pointer';
+			$docControlBtn.style['z-index']	= '9999';
+			pageframe.document.body.append($docControlBtn);
+	        
+	        $docControlBtn.onmouseover	= function(){
+	        	$docControlBtn.style.color	= "#000000";
+	        }
+	        $docControlBtn.onmouseout	= function(){
+	        	$docControlBtn.style.color	= "#999999";
+	        }
+	        $docControlBtn.onclick		= function(){
+	        	if($docControlBtn.getAttribute('size') == 'small'){
+	            	$docControlBtn.setAttribute('size', 'big');
+	            	document.getElementsByTagName('frameset').rootframe.cols="300, *";        		        		
+	        	}else{
+	        		console.log($docControlBtn.getAttribute('size'));
+	            	$docControlBtn.setAttribute('size', 'small');
+	        		console.log($docControlBtn.getAttribute('size'));
+	            	document.getElementsByTagName('frameset').rootframe.cols="0, *";
+	        	}
+	        }
+	
+	        
+	        if(window.innerWidth <= 768 || pageframe.location.href == menuframe.location.href){
+	        	console.log(pageframe.location.href, menuframe.location.href);
+	    		let $docSizeControl	= pageframe.document.getElementById('doc-size-control');
+	    		$docSizeControl.click();
+	    	}
+		};
+	    window.onload = function(){
+	        if(pageframe.location.href == "about:blank"){
+	        	pageframe.location.href	= menuframe.location.href;
+	        } 	
+	    }
+    </script>
 </head>
 <frameset cols="300, *" frameboder="no" border="1" name="rootframe">
   <frame name="menuframe" src="menu.html" />
-  <frame name="pageframe" />
+  <frame name="pageframe" src="menu.html"  onload="menuSizeControl()" />
 </frameset>
 
 </html>
