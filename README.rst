@@ -5,6 +5,7 @@ handbook-tool，是PHP开发的一个简易的web端用户手册编写工具。
 demo
 ------------------------
 手册编辑入口： http://handbook-demo.licy.top （密钥: licy.top）
+
 手册阅读入口: http://handbook-demo.licy.top/handbook
 
 体验一下
