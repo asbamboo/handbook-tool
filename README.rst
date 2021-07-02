@@ -8,6 +8,8 @@ demo
 
 手册阅读入口: http://handbook-demo.licy.top/handbook
 
+.. image:: demo.png
+
 体验一下
 -------------------------
 
