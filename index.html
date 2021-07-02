@@ -6,13 +6,27 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="手册制作工具">
     <meta name="author" content="李春寅 licy2013@aliyun.com">
+	<meta name="url" content="http://licy.top">
 	<style>
 		frameset {
 			border:0;
 		}
 	</style>
 	<script>
+		const getCookie = function(key){
+			let cookie	= {}; 
+			let tmp = document.cookie.split(";");
+			for(let i = 0; i < tmp.length; i++){
+				let parse = tmp[i].split('=');
+				cookie[parse[0].trim()] = parse[1].trim(); 
+			}
+			return cookie[key];
+		}
+	
 		const checkKey	= function(){
+			if(getCookie('secret_hash')){
+				return;
+			}
 			let checked = false;
 			if(key = prompt("Please enter a valid key for the system。")){
 				let xhr = new XMLHttpRequest();

@@ -55,14 +55,15 @@ if(!file_exists($handbook_index_html = rtrim($GLOBALS['CONFIG']['HANDBOOK_ROOT']
 }
     
 if($_GET['type'] == "key.check"){
-    $key    = file_get_contents('php://input');
+    $key    = empty($_COOKIE['secret_hash']) ? file_get_contents('php://input') : $_COOKIE['secret_hash'];
     if($key == $GLOBALS['CONFIG']['HANDBOOK_SECRET_KEY']){
-        $_SESSION['secret_checked'] = true;
+        $_SESSION['secret_hash'] = md5(uniqid());
+        header('set-cookie: secret_hash=' . $_SESSION['secret_hash']);
         exit('SUCCESS');
     }else{
         exit('OUT');
     }
-}else if(empty($_SESSION['secret_checked'])){
+}else if(empty($_SESSION['secret_hash']) || empty($_COOKIE['secret_hash']) || $_SESSION['secret_hash'] != $_COOKIE['secret_hash']){
     exit('OUT');
 }
 
